@@ -1,4 +1,8 @@
+import 'package:appointment/db/Controller.dart';
+import 'package:appointment/models/entities/Pacient.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:appointment/main.dart';
 
 class NewPacient extends StatefulWidget {
   NewPacient({Key key, this.title}) : super(key: key);
@@ -9,6 +13,14 @@ class NewPacient extends StatefulWidget {
 }
 
 class NewPacientState extends State<NewPacient> {
+
+  TextEditingController nameController = new TextEditingController();
+  TextEditingController emailController = new TextEditingController();
+  TextEditingController phoneNumberController = new TextEditingController();
+  TextEditingController extraController = new TextEditingController();
+
+  var phoneNumberMask = new MaskTextInputFormatter(mask: '## (##) #####-####', filter: {"#": RegExp(r'[0-9]') });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +33,7 @@ class NewPacientState extends State<NewPacient> {
               padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
               child: Form(
                 child: TextFormField(
+                  controller: nameController,
                   decoration: InputDecoration(
                       labelText: "Patient Name",
                       hintText: "Patient Name",
@@ -35,6 +48,7 @@ class NewPacientState extends State<NewPacient> {
               padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
               child: Form(
                 child: TextFormField(
+                  controller: emailController,
                   decoration: InputDecoration(
                       labelText: "Patient email",
                       hintText: "Patient email",
@@ -49,6 +63,7 @@ class NewPacientState extends State<NewPacient> {
               padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
               child: Form(
                 child: TextFormField(
+                  controller: extraController,
                   decoration: InputDecoration(
                       labelText: "Patient description",
                       hintText: "Patient description",
@@ -58,7 +73,28 @@ class NewPacientState extends State<NewPacient> {
                   ),
                 ),
               ),
-            )
+            ),
+            Container(
+              padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+              child: Form(
+                child: TextFormField(
+                  controller: phoneNumberController,
+                  inputFormatters: [phoneNumberMask],
+                  decoration: InputDecoration(
+                      labelText: "Patient phone number",
+                      hintText: "Patient phone number",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0)
+                      )
+                  ),
+                ),
+              ),
+            ),
+            FloatingActionButton(child: Icon(Icons.add), heroTag: null,
+                onPressed: () async {
+                  Pacient newP = Pacient(name: nameController.text, email: emailController.text, phoneNumber: phoneNumberController.text, extra: extraController.text);
+                  await DBController().insertPatient(newP);
+            }),
           ],
         )
       ),

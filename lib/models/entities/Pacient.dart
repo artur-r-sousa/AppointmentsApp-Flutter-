@@ -1,12 +1,17 @@
+
 class Pacient {
-  String id;
+  int id;
   String name;
   String email;
+  String phoneNumber;
+  String extra;
 
   Pacient({
     this.id,
     this.name,
-    this.email
+    this.email,
+    this.phoneNumber,
+    this.extra
 });
 
 
@@ -27,6 +32,15 @@ class Pacient {
     this.name = name;
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'extra': extra,
+    };
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -35,4 +49,8 @@ class Pacient {
   @override
   int get hashCode => id.hashCode;
 
+  @override
+  String toString() {
+    return 'Pacient: $name, $email, $phoneNumber, $extra';
+  }
 }
