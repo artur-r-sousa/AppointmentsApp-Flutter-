@@ -1,5 +1,6 @@
 import 'package:appointment/Screens/AppointmentDetails.dart';
 import 'package:appointment/Screens/MyHomePage.dart';
+import 'package:appointment/db/Controller.dart';
 import 'package:appointment/models/entities/Appointment.dart';
 import 'package:appointment/models/entities/Pacient.dart';
 import 'package:flutter/material.dart';
@@ -124,17 +125,16 @@ class NewAppointmentState extends State<NewAppointment> {
                       child: Icon(
                         Icons.add,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          Appointment appNew = new Appointment();
-                          Pacient newPacient = new Pacient();
-                          newPacient.setName(nameController.text);
-                          newPacient.setEmail(emailController.text);
-                          appNew.setPacient(newPacient);
-                          hourController.text != "" ? appNew.setMonthDay(DateTime.parse("${formatter.format(MyHomePageState.selectedDate)} " + "${hourController.text}" + ":00Z")) : appNew.setMonthDay(DateTime.now());
-                          Appointment.addApointment(appNew);
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
-                        });
+                      onPressed: () async {
+                        Appointment appNew = new Appointment();
+                        Pacient newPacient = new Pacient();
+                        newPacient.setName(nameController.text);
+                        newPacient.setEmail(emailController.text);
+                        appNew.setPacient(newPacient.id);
+                        hourController.text != "" ? appNew.setMonthDay(DateTime.parse("${formatter.format(MyHomePageState.selectedDate)} " + "${hourController.text}")) : appNew.setMonthDay(DateTime.now());
+                        DBController().insertAppointment(appNew);
+                        print(await DBController().getAppointments());
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
                       }
                   ),
                   Padding(padding: EdgeInsets.only(left: 15), child: Text("New Appointment")),
@@ -152,11 +152,50 @@ class NewAppointmentState extends State<NewAppointment> {
                           Icons.arrow_back
                       ),
                       onPressed: (){ setState(() {
+
                         Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
                       });}),
                   Padding(padding: EdgeInsets.only(left: 15), child: Text("Go Back")),
                 ],
               )
+            ),
+            Container(
+                padding: EdgeInsets.all(20),
+                alignment: Alignment.bottomLeft,
+                child: Row(
+                  children: [
+                    FloatingActionButton(
+                        heroTag: null,
+                        child: Icon(
+                            Icons.arrow_back
+                        ),
+                        onPressed: (){ setState(() {
+                          DBController().deleteAllPacients();
+
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
+                        });}),
+                    Padding(padding: EdgeInsets.only(left: 15), child: Text("Delete all patients")),
+                  ],
+                )
+            ),
+            Container(
+                padding: EdgeInsets.all(20),
+                alignment: Alignment.bottomLeft,
+                child: Row(
+                  children: [
+                    FloatingActionButton(
+                        heroTag: null,
+                        child: Icon(
+                            Icons.arrow_back
+                        ),
+                        onPressed: (){ setState(() {
+                          DBController().deleteAllAppointments();
+
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
+                        });}),
+                    Padding(padding: EdgeInsets.only(left: 15), child: Text("Delete all appointments")),
+                  ],
+                )
             )
           ],
         ),

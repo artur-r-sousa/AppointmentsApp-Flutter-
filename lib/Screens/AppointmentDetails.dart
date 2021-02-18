@@ -1,6 +1,8 @@
 import 'package:appointment/Screens/MyHomePage.dart';
+import 'package:appointment/db/Controller.dart';
 import 'package:appointment/models/entities/Appointment.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'NewAppointment.dart';
 
@@ -13,34 +15,35 @@ class AppointmentDetails extends StatefulWidget{
 }
 
 class _AppointmentDetailsState extends State<AppointmentDetails>{
-
-
-
-  List<Appointment> appnDate = Appointment.appnsList;
+  DateFormat queryDateFormatter = DateFormat('yyyy-MM-dd');
+  DateFormat titleFormatter = DateFormat('dd-MM-yyyy');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Appointments for "+MyHomePageState.getDate())),
+      appBar: AppBar(title: Text("Appointments for "+titleFormatter.format(MyHomePageState.getDate()))),
       body: Container(
         child: Stack(
           children: <Widget> [
-            ListView.builder(
-              itemCount: Appointment.appnsList.length,
-              itemBuilder: (context, index){
-                return ListTile(
-                  title: Text('${Appointment.appnsList[index].getHourFormatted(Appointment.appnsList[index].monthDay)}'),
-                  leading: Icon(
-                      Icons.assignment
-                  ),
-                  subtitle: Text(appnDate[index].pacient == null || appnDate[index].pacient.name == "" ? "No patient Added yet" : appnDate[index].pacient.name),
-                  trailing: Icon(
-                      Icons.arrow_right
-                  ),
-                );
-              },
-            ),
-            Container(
+            FutureBuilder<List>(
+              future: DBController().getAppointmentsFromDay(queryDateFormatter.format(MyHomePageState.getDate())),
+              builder: (context, snapshot) {
+                return snapshot.hasData ? ListView.builder(
+                  itemCount: snapshot.data.length,
+                    itemBuilder: (_, int position) {
+                    final item = snapshot.data[position];
+                    return Card(
+                      child: ListTile(
+                        title: Text(
+                          snapshot.data[position].toString()),
+                        ),
+
+                    );
+                    }
+                ) : Center(child: CircularProgressIndicator());
+              }
+            )
+            ,Container(
               padding: EdgeInsets.all(20),
               alignment: Alignment.bottomRight,
               child: Row(
@@ -64,3 +67,5 @@ class _AppointmentDetailsState extends State<AppointmentDetails>{
     );
   }
 }
+
+

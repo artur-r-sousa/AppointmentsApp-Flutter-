@@ -1,12 +1,15 @@
 import 'package:appointment/Screens/AppointmentDetails.dart';
 import 'package:appointment/Screens/NewAppointment.dart';
 import 'package:appointment/Screens/NewPacient.dart';
+import 'package:appointment/db/Controller.dart';
 import 'package:appointment/models/entities/Appointment.dart';
 import 'package:appointment/utils/CircularButton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+import 'AllPacients.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -40,17 +43,22 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
 
   static DateTime selectedDate;
 
-  static String getDate(){
-    return dateFormatter.format(selectedDate);
+  static DateTime getDate(){
+    return selectedDate;
   }
 
   void _onDaySelected(DateTime day, List events, List holidays) {
     setState(() {
       selectedDate = _controller.selectedDay;
-      Appointment appointment = new Appointment(monthDay: day);
-      Appointment.appnsList.add(appointment);
-      events.add(Navigator.push(context,
-          MaterialPageRoute(builder: (context) => AppointmentDetails())));
+      if (DBController().getAppointments() == null ) {
+
+        events.add(Navigator.push(context,
+            MaterialPageRoute(builder: (context) => NewAppointment())));
+      } else {
+        print('got here 2');
+        events.add(Navigator.push(context,
+            MaterialPageRoute(builder: (context) => AppointmentDetails())));
+      }
       _selectedEvents = events;
     });
   }
@@ -161,7 +169,7 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
                                 icon: Icon(Icons.label_important),
                                 color: Colors.blueAccent,
                                 onClick: () {
-                                  print('person button clicked');
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => AllPacients()));
                                 },
                               ),
                             ),

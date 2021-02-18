@@ -3,16 +3,16 @@ import 'package:intl/intl.dart';
 import 'Pacient.dart';
 
 class Appointment {
-  final DateFormat formatter = DateFormat('dd-MM-yyyy');
-  final DateFormat hourFormatter = DateFormat('HH:mm');
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  final DateFormat hourFormatter = DateFormat('HH:mm:ss');
+  final DateFormat toStringFormat = DateFormat('dd-MM-yyyy');
 
-  Pacient pacient;
+
+  int id;
+  int pacientId;
   DateTime monthDay;
-  static List<Appointment> appnsList = new List();
 
-
-
-  Appointment({this.monthDay});
+  Appointment({this.monthDay, this.pacientId});
 
   String getDateFormatted(DateTime monthDay) {
     return formatter.format(monthDay);
@@ -26,20 +26,20 @@ class Appointment {
     this.monthDay = monthDay;
   }
 
-  void setPacient(Pacient pacient) {
-    this.pacient = pacient;
-  }
-
-  static List<Appointment> getAppointments() {
-    return appnsList;
-  }
-
-  static void addApointment(Appointment appointment) {
-    appnsList.add(appointment);
+  void setPacient(int pacientId) {
+    this.pacientId = pacientId;
   }
 
   @override
   String toString() {
-    return 'Appointment: Day: ${formatter.format(monthDay)}, time: ${hourFormatter.format(monthDay)}';
+    return 'Appointment: Day: ${toStringFormat.format(monthDay)}, id:$pacientId, time: ${hourFormatter.format(monthDay)}';
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'date':formatter.format(monthDay),
+      'hour':hourFormatter.format(monthDay),
+
+    };
   }
 }
