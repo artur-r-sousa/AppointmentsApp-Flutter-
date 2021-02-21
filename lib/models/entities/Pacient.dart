@@ -32,6 +32,14 @@ class Pacient {
     this.name = name;
   }
 
+  void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
+
+  void setExtra(String extra) {
+    this.extra = extra;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'name': name,
@@ -51,6 +59,10 @@ class Pacient {
 
   @override
   String toString() {
-    return 'Pacient: $name, $email, $phoneNumber, $extra';
+    if (email != "" || email != null) {
+      return '$name, $email, $phoneNumber';
+    }else {
+      return'$name, $phoneNumber';
+    }
   }
 }

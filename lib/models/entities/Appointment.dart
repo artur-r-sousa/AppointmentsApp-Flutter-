@@ -1,3 +1,4 @@
+import 'package:appointment/db/Controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'Pacient.dart';
@@ -6,6 +7,7 @@ class Appointment {
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
   final DateFormat hourFormatter = DateFormat('HH:mm:ss');
   final DateFormat toStringFormat = DateFormat('dd-MM-yyyy');
+
 
 
   int id;
@@ -30,16 +32,19 @@ class Appointment {
     this.pacientId = pacientId;
   }
 
+
+
+
   @override
-  String toString() {
-    return 'Appointment: Day: ${toStringFormat.format(monthDay)}, id:$pacientId, time: ${hourFormatter.format(monthDay)}';
+  String toString(){
+    return '${hourFormatter.format(monthDay)}';
   }
 
   Map<String, dynamic> toMap() {
     return {
       'date':formatter.format(monthDay),
       'hour':hourFormatter.format(monthDay),
-
+      'pacientId':pacientId,
     };
   }
 }

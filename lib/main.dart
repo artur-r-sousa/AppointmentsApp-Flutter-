@@ -1,6 +1,7 @@
 
 import 'package:appointment/db/Controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -10,7 +11,9 @@ import 'models/entities/Pacient.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DBController().getDB();
-  runApp(MyApp());
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -28,6 +31,8 @@ class MyApp extends StatelessWidget {
   }
 
 }
+
+
 
 
 

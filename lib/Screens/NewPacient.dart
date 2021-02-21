@@ -19,8 +19,9 @@ class NewPacientState extends State<NewPacient> {
   TextEditingController phoneNumberController = new TextEditingController();
   TextEditingController extraController = new TextEditingController();
 
-  var phoneNumberMask = new MaskTextInputFormatter(mask: '## (##) #####-####', filter: {"#": RegExp(r'[0-9]') });
+  var phoneNumberMask = new MaskTextInputFormatter(mask: '## #####-####', filter: {"#": RegExp(r'[0-9]') });
 
+  //reminder to send this method to the utils class
   Future<void> _showMyDialog(String title, String dialogText) async {
     return showDialog<void>(
       context: context,
@@ -123,6 +124,8 @@ class NewPacientState extends State<NewPacient> {
                   onPressed: () async {
                     if (nameController.text == "" || nameController.text == "Patient Name") {
                       _showMyDialog("Empty Fields", "Name field can't be empty");
+                    } else if(phoneNumberController.text == "" || phoneNumberController.text == "Phone Number") {
+                      _showMyDialog("Empty Fields", "Phone field can't be empty");
                     } else {
                       Pacient newP = Pacient(name: nameController.text, email: emailController.text, phoneNumber: phoneNumberController.text, extra: extraController.text);
                       await DBController().insertPatient(newP);

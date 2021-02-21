@@ -1,18 +1,12 @@
-import 'package:appointment/Screens/MyHomePage.dart';
 import 'package:appointment/Screens/NewPacient.dart';
 import 'package:appointment/db/Controller.dart';
-import 'package:appointment/models/entities/Appointment.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-import 'NewAppointment.dart';
 
 class AllPacients extends StatefulWidget{
   AllPacients({Key key, this.title}) : super(key: key);
   final String title;
   @override
   _AllPacientsState createState() => _AllPacientsState();
-
 }
 
 class _AllPacientsState extends State<AllPacients>{
@@ -30,13 +24,11 @@ class _AllPacientsState extends State<AllPacients>{
                     return snapshot.hasData ? ListView.builder(
                         itemCount: snapshot.data.length,
                         itemBuilder: (_, int position) {
-                          final item = snapshot.data[position];
                           return Card(
                             child: ListTile(
                               title: Text(
                                   snapshot.data[position].toString()),
                             ),
-
                           );
                         }
                     ) : Center(child: CircularProgressIndicator());

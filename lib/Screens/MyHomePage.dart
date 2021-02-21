@@ -6,6 +6,7 @@ import 'package:appointment/models/entities/Appointment.dart';
 import 'package:appointment/utils/CircularButton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -92,7 +93,8 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),

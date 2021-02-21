@@ -1,11 +1,12 @@
 import 'package:appointment/models/entities/Appointment.dart';
 import 'package:appointment/models/entities/Pacient.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 
-class DBController {
+class DBController{
 
   Future<Database> getDB() async {
 
@@ -57,6 +58,44 @@ class DBController {
     });
   }
 
+  Future<List<Pacient>> getPacients(int id) async {
+    // Get a reference to the database.
+    final Database db = await getDB();
+
+    // Query the table for all The pacients.
+    final List<Map<String, dynamic>> maps = await db.query('patients', where: "id = ?", whereArgs: [id]);
+
+    // Convert the List<Map<String, dynamic> into a List<Pacient>.
+    return List.generate(maps.length, (i) {
+      return Pacient(
+        id: maps[i]['id'],
+        name: maps[i]['name'],
+        email: maps[i]['email'],
+        phoneNumber: maps[i]['phoneNumber'],
+        extra: maps[i]['extra'],
+      );
+    });
+  }
+
+  Future<List<Pacient>> getPacientsByPN(String phoneNumber) async {
+    // Get a reference to the database.
+    final Database db = await getDB();
+
+    // Query the table for all The pacients.
+    final List<Map<String, dynamic>> maps = await db.query('patients', where: "phoneNumber = ?", whereArgs: [phoneNumber]);
+
+    // Convert the List<Map<String, dynamic> into a List<Pacient>.
+    return List.generate(maps.length, (i) {
+      return Pacient(
+        id: maps[i]['id'],
+        name: maps[i]['name'],
+        email: maps[i]['email'],
+        phoneNumber: maps[i]['phoneNumber'],
+        extra: maps[i]['extra'],
+      );
+    });
+  }
+
   Future<void> deletePacient(int id) async {
     final db = await getDB();
 
@@ -72,8 +111,6 @@ class DBController {
     await db.update('pacients', pacient.toMap(),
     where: "id = ?", whereArgs: [pacient.id]);
   }
-
-
 
   Future<List<Appointment>> getAppointments() async {
     // Get a reference to the database.
@@ -96,7 +133,7 @@ class DBController {
     final Database db = await getDB();
 
     // Query the table for all The Appointments.
-    final List<Map<String, dynamic>> maps = await db.query('appointments', where: "date = ?", whereArgs: [day]);
+    final List<Map<String, dynamic>> maps = await db.query('appointments', where: "date = ?", whereArgs: [day], orderBy: 'hour ASC');
 
     // Convert the List<Map<String, dynamic> into a List<Appointment>.
     return List.generate(maps.length, (i) {
@@ -107,6 +144,10 @@ class DBController {
     });
   }
 
+  Future<Pacient> getPacientFromAppointment(Appointment appointment) async {
+    List<Pacient> pacList = await DBController().getPacients(appointment.pacientId);
+    return pacList[0];
+  }
 
   Future<void> insertAppointment(Appointment appointment) async {
     Database db = await getDB();

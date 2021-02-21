@@ -20,6 +20,8 @@ class NewAppointmentState extends State<NewAppointment> {
   TextEditingController hourController = new TextEditingController();
   TextEditingController nameController = new TextEditingController();
   TextEditingController emailController = new TextEditingController();
+  TextEditingController phoneNumberController = new TextEditingController();
+  TextEditingController extraController = new TextEditingController();
 
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
@@ -31,6 +33,7 @@ class NewAppointmentState extends State<NewAppointment> {
   }
 
   var maskFormatter = new MaskTextInputFormatter(mask: '&!:*@', filter: {"&": RegExp(r'[0-2]'), "!": RegExp(r'[0-9]'), "*": RegExp(r'[0-5]'),"@": RegExp(r'[0-9]')});
+  var phoneNumberMask = new MaskTextInputFormatter(mask: '## #####-####', filter: {"#": RegExp(r'[0-9]') });
 
   void changeFormat() {
     if(hourController.text == "2") {
@@ -44,10 +47,38 @@ class NewAppointmentState extends State<NewAppointment> {
     return maskFormatter;
   }
 
+  //reminder to send this method to the utils class
+  Future<void> _showMyDialog(String title, String dialogText) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(dialogText),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Back'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(title: Text("New Appointments")),
       body: Container(
         child: Column(
@@ -116,6 +147,23 @@ class NewAppointmentState extends State<NewAppointment> {
               ),
             ),
             Container(
+              padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+              child: Form(
+                child: TextFormField(
+                  controller: phoneNumberController,
+                  inputFormatters: [phoneNumberMask],
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                      labelText: "Patient phone number",
+                      hintText: "Patient phone number",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0)
+                      )
+                  ),
+                ),
+              ),
+            ),
+            Container(
               padding: EdgeInsets.all(20),
               alignment: Alignment.bottomLeft,
               child: Row(
@@ -126,15 +174,34 @@ class NewAppointmentState extends State<NewAppointment> {
                         Icons.add,
                       ),
                       onPressed: () async {
-                        Appointment appNew = new Appointment();
-                        Pacient newPacient = new Pacient();
-                        newPacient.setName(nameController.text);
-                        newPacient.setEmail(emailController.text);
-                        appNew.setPacient(newPacient.id);
-                        hourController.text != "" ? appNew.setMonthDay(DateTime.parse("${formatter.format(MyHomePageState.selectedDate)} " + "${hourController.text}")) : appNew.setMonthDay(DateTime.now());
-                        DBController().insertAppointment(appNew);
-                        print(await DBController().getAppointments());
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
+                        if (nameController.text == "" || nameController.text == "Patient Name") {
+                          _showMyDialog("Empty Fields", "Name field can't be empty");
+                        } else if(phoneNumberController.text == "" || phoneNumberController.text == "Phone Number") {
+                          _showMyDialog("Empty Fields", "Phone field can't be empty");
+                        } else {
+                          Appointment appNew = new Appointment();
+                          Pacient newPacient = new Pacient();
+                          newPacient.setName(nameController.text);
+                          newPacient.setEmail(emailController.text);
+                          newPacient.setPhoneNumber(phoneNumberController.text);
+                          newPacient.setExtra(extraController.text);
+                          //send patient to db. when you retrieve the patient the result is a list<pacient>, so put it in
+                          // a list and access the first(and only since phone number is a unique identification) result, then get its id
+                          setState(()  {
+                            DBController().insertPatient(newPacient);
+                          });
+                          List<Pacient> gettingPatient = await DBController().getPacientsByPN(phoneNumberController.text);
+                          print(phoneNumberController.text);
+                          print(gettingPatient);
+
+                          setState(() {
+                              appNew.setPacient(gettingPatient[0].id);
+                              hourController.text != "" ? appNew.setMonthDay(DateTime.parse("${formatter.format(MyHomePageState.selectedDate)} " + "${hourController.text}")) : appNew.setMonthDay(DateTime.now());
+                              DBController().insertAppointment(appNew);
+                              Navigator.pop(context);
+                            });
+
+                        }
                       }
                   ),
                   Padding(padding: EdgeInsets.only(left: 15), child: Text("New Appointment")),
@@ -153,7 +220,7 @@ class NewAppointmentState extends State<NewAppointment> {
                       ),
                       onPressed: (){ setState(() {
 
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
+                        Navigator.pop(context);
                       });}),
                   Padding(padding: EdgeInsets.only(left: 15), child: Text("Go Back")),
                 ],
@@ -172,7 +239,7 @@ class NewAppointmentState extends State<NewAppointment> {
                         onPressed: (){ setState(() {
                           DBController().deleteAllPacients();
 
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
+                          Navigator.pop(context);
                         });}),
                     Padding(padding: EdgeInsets.only(left: 15), child: Text("Delete all patients")),
                   ],
@@ -190,8 +257,7 @@ class NewAppointmentState extends State<NewAppointment> {
                         ),
                         onPressed: (){ setState(() {
                           DBController().deleteAllAppointments();
-
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
+                          Navigator.pop(context);
                         });}),
                     Padding(padding: EdgeInsets.only(left: 15), child: Text("Delete all appointments")),
                   ],
@@ -200,8 +266,6 @@ class NewAppointmentState extends State<NewAppointment> {
           ],
         ),
       ),
-
     );
   }
-
 }
