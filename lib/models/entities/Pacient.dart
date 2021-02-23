@@ -14,8 +14,6 @@ class Pacient {
     this.extra
 });
 
-
-
   String getName() {
     return this.name;
   }

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-
 class DBController{
 
   Future<Database> getDB() async {
@@ -28,13 +27,12 @@ class DBController{
     return database;
   }
 
-  Future<AlertDialog> insertPatient(Pacient pacient) async {
+  Future<void> insertPatient(Pacient pacient) async {
     Database db = await getDB();
     await db.insert(
         'patients', pacient.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace
     );
-    return AlertDialog(title: Text('Success Message'), content: Text("Success"));
   }
 
 
@@ -123,7 +121,25 @@ class DBController{
     return List.generate(maps.length, (i) {
       return Appointment(
         monthDay: DateTime.parse(maps[i]['date'].toString() + " " + maps[i]['hour'].toString()),
-        pacientId: maps[i]['pacientId']
+        pacientId: maps[i]['pacientId'],
+        id: maps[i]['id']
+      );
+    });
+  }
+
+  Future<List<Appointment>> getAppointment(int id) async {
+    // Get a reference to the database.
+    final Database db = await getDB();
+
+    // Query the table for all The Appointments.
+    final List<Map<String, dynamic>> maps = await db.query('appointments', where: 'id = ?', whereArgs: [id]);
+
+    // Convert the List<Map<String, dynamic> into a List<Appointment>.
+    return List.generate(maps.length, (i) {
+      return Appointment(
+          monthDay: DateTime.parse(maps[i]['date'].toString() + " " + maps[i]['hour'].toString()),
+          pacientId: maps[i]['pacientId'],
+          id: maps[i]['id']
       );
     });
   }
@@ -139,7 +155,8 @@ class DBController{
     return List.generate(maps.length, (i) {
       return Appointment(
           monthDay: DateTime.parse(maps[i]['date'].toString() + " " + maps[i]['hour'].toString()),
-          pacientId: maps[i]['pacientId']
+          pacientId: maps[i]['pacientId'],
+          id: maps[i]['id']
       );
     });
   }
@@ -147,6 +164,11 @@ class DBController{
   Future<Pacient> getPacientFromAppointment(Appointment appointment) async {
     List<Pacient> pacList = await DBController().getPacients(appointment.pacientId);
     return pacList[0];
+  }
+
+  Future<Appointment> getAppn(int id) async {
+    List<Appointment> appnList = await DBController().getAppointment(id);
+    return appnList[0];
   }
 
   Future<void> insertAppointment(Appointment appointment) async {
@@ -173,6 +195,11 @@ class DBController{
     );
   }
 
+  Future<void> deleteAppointment(int id) async {
+    final db = await getDB();
 
-
+    await db.delete(
+      'appointments', where: "id = ?", whereArgs: [id]
+    );
+  }
 }

@@ -8,13 +8,15 @@ class Appointment {
   final DateFormat hourFormatter = DateFormat('HH:mm:ss');
   final DateFormat toStringFormat = DateFormat('dd-MM-yyyy');
 
-
-
   int id;
   int pacientId;
   DateTime monthDay;
 
-  Appointment({this.monthDay, this.pacientId});
+  Appointment({
+    this.id,
+    this.monthDay,
+    this.pacientId
+  });
 
   String getDateFormatted(DateTime monthDay) {
     return formatter.format(monthDay);
@@ -32,13 +34,20 @@ class Appointment {
     this.pacientId = pacientId;
   }
 
-
-
-
   @override
   String toString(){
-    return '${hourFormatter.format(monthDay)}';
+    return '${hourFormatter.format(monthDay)}, $id';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Appointment &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 
   Map<String, dynamic> toMap() {
     return {

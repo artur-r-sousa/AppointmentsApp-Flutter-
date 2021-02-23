@@ -66,7 +66,7 @@ class NewAppointmentState extends State<NewAppointment> {
             TextButton(
               child: Text('Back'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context);
               },
             ),
           ],
@@ -198,7 +198,7 @@ class NewAppointmentState extends State<NewAppointment> {
                               appNew.setPacient(gettingPatient[0].id);
                               hourController.text != "" ? appNew.setMonthDay(DateTime.parse("${formatter.format(MyHomePageState.selectedDate)} " + "${hourController.text}")) : appNew.setMonthDay(DateTime.now());
                               DBController().insertAppointment(appNew);
-                              Navigator.pop(context);
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
                             });
 
                         }

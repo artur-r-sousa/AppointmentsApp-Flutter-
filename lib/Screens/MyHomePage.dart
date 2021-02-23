@@ -52,11 +52,9 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
     setState(() {
       selectedDate = _controller.selectedDay;
       if (DBController().getAppointments() == null ) {
-
         events.add(Navigator.push(context,
             MaterialPageRoute(builder: (context) => NewAppointment())));
       } else {
-        print('got here 2');
         events.add(Navigator.push(context,
             MaterialPageRoute(builder: (context) => AppointmentDetails())));
       }
@@ -86,7 +84,6 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
      curve: Curves.easeOut));
     _animationController.addListener(() {
       setState(() {
-
       });
     });
   }

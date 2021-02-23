@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import 'Screens/UpdatePacient.dart';
 import 'Screens/MyHomePage.dart';
 import 'models/entities/Pacient.dart';
 
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Welcome'), debugShowCheckedModeBanner: false,
+      home: MyHomePage(title: 'Welcome',), debugShowCheckedModeBanner: false, //MyHomePage(title: 'Welcome') //UpdatePacient(title: 't')
     );
   }
 

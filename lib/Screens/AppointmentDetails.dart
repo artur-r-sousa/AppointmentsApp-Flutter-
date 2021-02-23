@@ -2,6 +2,7 @@ import 'package:appointment/Screens/MyHomePage.dart';
 import 'package:appointment/db/Controller.dart';
 import 'package:appointment/models/entities/Appointment.dart';
 import 'package:appointment/models/entities/Pacient.dart';
+import 'package:appointment/Screens/UpdatePacient.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'NewAppointment.dart';
@@ -10,17 +11,35 @@ class AppointmentDetails extends StatefulWidget{
   AppointmentDetails({Key key, this.title}) : super(key: key);
   final String title;
   @override
-  _AppointmentDetailsState createState() => _AppointmentDetailsState();
+  AppointmentDetailsState createState() => AppointmentDetailsState();
 
 }
 
-class _AppointmentDetailsState extends State<AppointmentDetails>{
+class AppointmentDetailsState extends State<AppointmentDetails>{
   DateFormat queryDateFormatter = DateFormat('yyyy-MM-dd');
   DateFormat titleFormatter = DateFormat('dd-MM-yyyy');
 
   Future<String> pacientName(int id) async {
     List<Pacient> name = await DBController().getPacients(id);
     return name[0].name;
+  }
+
+  static Pacient pacientHolder = new Pacient();
+
+  Future<void> getPacient(Appointment appointment) async {
+    Pacient foo = await DBController().getPacientFromAppointment(appointment);
+    pacientHolder = foo;
+  }
+
+
+  static Appointment appointmentHolder = new Appointment();
+
+  static Appointment getAppointmentHolder() {
+    return appointmentHolder;
+  }
+
+  static void setAppn(Appointment appointment) {
+    appointmentHolder = appointment;
   }
 
   @override
@@ -44,7 +63,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails>{
                             ListTile(
                               onTap: () {
 
-                      },
+                                setAppn(item);
+                                print(appointmentHolder);
+                                getPacient(item);
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePacient()));
+                              },
                               title: Text(
                                   snapshot.data[position].toString()),
                             ),
@@ -52,6 +75,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails>{
                                 future: DBController().getPacientFromAppointment(snapshot.data[position]),
                                 builder: (context, snapshot2){
                                   return snapshot2.hasData ? ListTile(
+                                    onTap: () {
+                                      print(snapshot.data[position].toString());
+                                      print(snapshot2.data.toString());
+
+                                    },
                                     title: Text(snapshot2.data.toString())
                                   ) : Center(child: CircularProgressIndicator());
                                 })
