@@ -1,7 +1,4 @@
-import 'package:appointment/db/Controller.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'Pacient.dart';
 
 class Appointment {
   final DateFormat formatter = DateFormat('yyyy-MM-dd');

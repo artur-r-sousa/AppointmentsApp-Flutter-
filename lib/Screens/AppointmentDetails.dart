@@ -19,16 +19,11 @@ class AppointmentDetailsState extends State<AppointmentDetails>{
   DateFormat queryDateFormatter = DateFormat('yyyy-MM-dd');
   DateFormat titleFormatter = DateFormat('dd-MM-yyyy');
 
-  Future<String> pacientName(int id) async {
-    List<Pacient> name = await DBController().getPacients(id);
-    return name[0].name;
-  }
-
   static Pacient pacientHolder = new Pacient();
 
   Future<void> getPacient(Appointment appointment) async {
-    Pacient foo = await DBController().getPacientFromAppointment(appointment);
-    pacientHolder = foo;
+    Pacient p = await DBController().getPacientFromAppointment(appointment);
+    pacientHolder = p;
   }
 
 
@@ -62,9 +57,7 @@ class AppointmentDetailsState extends State<AppointmentDetails>{
                           children: [
                             ListTile(
                               onTap: () {
-
                                 setAppn(item);
-                                print(appointmentHolder);
                                 getPacient(item);
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePacient()));
                               },
@@ -76,9 +69,7 @@ class AppointmentDetailsState extends State<AppointmentDetails>{
                                 builder: (context, snapshot2){
                                   return snapshot2.hasData ? ListTile(
                                     onTap: () {
-                                      print(snapshot.data[position].toString());
-                                      print(snapshot2.data.toString());
-
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePacient()));
                                     },
                                     title: Text(snapshot2.data.toString())
                                   ) : Center(child: CircularProgressIndicator());

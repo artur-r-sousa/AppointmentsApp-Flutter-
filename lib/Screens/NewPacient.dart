@@ -1,5 +1,6 @@
 import 'package:appointment/db/Controller.dart';
 import 'package:appointment/models/entities/Pacient.dart';
+import 'package:appointment/utils/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:appointment/main.dart';
@@ -20,34 +21,6 @@ class NewPacientState extends State<NewPacient> {
   TextEditingController extraController = new TextEditingController();
 
   var phoneNumberMask = new MaskTextInputFormatter(mask: '## #####-####', filter: {"#": RegExp(r'[0-9]') });
-
-  //reminder to send this method to the utils class
-  Future<void> _showMyDialog(String title, String dialogText) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(dialogText),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Back'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,13 +96,14 @@ class NewPacientState extends State<NewPacient> {
               child: FloatingActionButton(child: Icon(Icons.add), heroTag: null,
                   onPressed: () async {
                     if (nameController.text == "" || nameController.text == "Patient Name") {
-                      _showMyDialog("Empty Fields", "Name field can't be empty");
+                      Utils().showMyDialog("Empty Fields", "Name field can't be empty", context);
                     } else if(phoneNumberController.text == "" || phoneNumberController.text == "Phone Number") {
-                      _showMyDialog("Empty Fields", "Phone field can't be empty");
+                      Utils().showMyDialog("Empty Fields", "Phone field can't be empty", context);
                     } else {
                       Pacient newP = Pacient(name: nameController.text, email: emailController.text, phoneNumber: phoneNumberController.text, extra: extraController.text);
                       await DBController().insertPatient(newP);
-                      print(await DBController().pacients());
+
+                      newP = new Pacient();
                     }
                   })
             ),

@@ -29,13 +29,14 @@ class NewAppointmentState extends State<NewAppointment> {
   @override
   void initState(){
     super.initState();
-    hourController.addListener(changeFormat);
+    hourController.addListener(changeHourFormat);
   }
 
   var maskFormatter = new MaskTextInputFormatter(mask: '&!:*@', filter: {"&": RegExp(r'[0-2]'), "!": RegExp(r'[0-9]'), "*": RegExp(r'[0-5]'),"@": RegExp(r'[0-9]')});
   var phoneNumberMask = new MaskTextInputFormatter(mask: '## #####-####', filter: {"#": RegExp(r'[0-9]') });
 
-  void changeFormat() {
+
+  void changeHourFormat() {
     if(hourController.text == "2") {
       maskFormatter.updateMask(mask: '&!:*@', filter: {"&": RegExp(r'[0-2]'), "!": RegExp(r'[0-3]'), "*": RegExp(r'[0-5]'),"@": RegExp(r'[0-9]')});
     } else {
@@ -135,10 +136,8 @@ class NewAppointmentState extends State<NewAppointment> {
                   keyboardType: TextInputType.number,
                   inputFormatters: [inputFormat()],
                   decoration: InputDecoration(
-
                       labelText: "Appointment Hour",
                       hintText: "00:00",
-
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0)
                       )
@@ -192,8 +191,6 @@ class NewAppointmentState extends State<NewAppointment> {
                           });
                           List<Pacient> gettingPatient = await DBController().getPacientsByPN(phoneNumberController.text);
                           print(phoneNumberController.text);
-                          print(gettingPatient);
-
                           setState(() {
                               appNew.setPacient(gettingPatient[0].id);
                               hourController.text != "" ? appNew.setMonthDay(DateTime.parse("${formatter.format(MyHomePageState.selectedDate)} " + "${hourController.text}")) : appNew.setMonthDay(DateTime.now());

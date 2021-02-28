@@ -1,7 +1,5 @@
 import 'package:appointment/models/entities/Appointment.dart';
 import 'package:appointment/models/entities/Pacient.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -106,7 +104,7 @@ class DBController{
   Future<void> updatePacient(Pacient pacient) async {
     final db = await getDB();
 
-    await db.update('pacients', pacient.toMap(),
+    await db.update('patients', pacient.toMap(),
     where: "id = ?", whereArgs: [pacient.id]);
   }
 
@@ -201,5 +199,12 @@ class DBController{
     await db.delete(
       'appointments', where: "id = ?", whereArgs: [id]
     );
+  }
+
+  Future<void> updateAppointment(Appointment appointment) async {
+    final db = await getDB();
+
+    await db.update('appointments', appointment.toMap(),
+        where: "id = ?", whereArgs: [appointment.id]);
   }
 }
