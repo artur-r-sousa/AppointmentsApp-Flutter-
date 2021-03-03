@@ -177,6 +177,8 @@ class NewAppointmentState extends State<NewAppointment> {
                           _showMyDialog("Empty Fields", "Name field can't be empty");
                         } else if(phoneNumberController.text == "" || phoneNumberController.text == "Phone Number") {
                           _showMyDialog("Empty Fields", "Phone field can't be empty");
+                        } else if(await DBController().testPhoneOnDB(phoneNumberController.text)) {
+                          _showMyDialog("Duplicate entries", "Phone already registered");
                         } else {
                           Appointment appNew = new Appointment();
                           Pacient newPacient = new Pacient();
@@ -184,15 +186,13 @@ class NewAppointmentState extends State<NewAppointment> {
                           newPacient.setEmail(emailController.text);
                           newPacient.setPhoneNumber(phoneNumberController.text);
                           newPacient.setExtra(extraController.text);
-                          //send patient to db. when you retrieve the patient the result is a list<pacient>, so put it in
-                          // a list and access the first(and only since phone number is a unique identification) result, then get its id
                           setState(()  {
                             DBController().insertPatient(newPacient);
                           });
-                          List<Pacient> gettingPatient = await DBController().getPacientsByPN(phoneNumberController.text);
-                          print(phoneNumberController.text);
+
+                          newPacient = await DBController().getPacientByPhone(newPacient.phoneNumber);
                           setState(() {
-                              appNew.setPacient(gettingPatient[0].id);
+                              appNew.setPacient(newPacient.id);
                               hourController.text != "" ? appNew.setMonthDay(DateTime.parse("${formatter.format(MyHomePageState.selectedDate)} " + "${hourController.text}")) : appNew.setMonthDay(DateTime.now());
                               DBController().insertAppointment(appNew);
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
@@ -223,43 +223,6 @@ class NewAppointmentState extends State<NewAppointment> {
                 ],
               )
             ),
-            Container(
-                padding: EdgeInsets.all(20),
-                alignment: Alignment.bottomLeft,
-                child: Row(
-                  children: [
-                    FloatingActionButton(
-                        heroTag: null,
-                        child: Icon(
-                            Icons.arrow_back
-                        ),
-                        onPressed: (){ setState(() {
-                          DBController().deleteAllPacients();
-
-                          Navigator.pop(context);
-                        });}),
-                    Padding(padding: EdgeInsets.only(left: 15), child: Text("Delete all patients")),
-                  ],
-                )
-            ),
-            Container(
-                padding: EdgeInsets.all(20),
-                alignment: Alignment.bottomLeft,
-                child: Row(
-                  children: [
-                    FloatingActionButton(
-                        heroTag: null,
-                        child: Icon(
-                            Icons.arrow_back
-                        ),
-                        onPressed: (){ setState(() {
-                          DBController().deleteAllAppointments();
-                          Navigator.pop(context);
-                        });}),
-                    Padding(padding: EdgeInsets.only(left: 15), child: Text("Delete all appointments")),
-                  ],
-                )
-            )
           ],
         ),
       ),

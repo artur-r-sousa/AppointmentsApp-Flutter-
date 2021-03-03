@@ -59,7 +59,7 @@ class AppointmentDetailsState extends State<AppointmentDetails>{
                               onTap: () {
                                 setAppn(item);
                                 getPacient(item);
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePacient()));
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UpdatePacient()));
                               },
                               title: Text(
                                   snapshot.data[position].toString()),
@@ -69,7 +69,7 @@ class AppointmentDetailsState extends State<AppointmentDetails>{
                                 builder: (context, snapshot2){
                                   return snapshot2.hasData ? ListTile(
                                     onTap: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePacient()));
+                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UpdatePacient()));
                                     },
                                     title: Text(snapshot2.data.toString())
                                   ) : Center(child: CircularProgressIndicator());

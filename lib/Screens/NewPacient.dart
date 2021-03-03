@@ -1,7 +1,9 @@
+import 'package:appointment/Screens/AllPacients.dart';
 import 'package:appointment/db/Controller.dart';
 import 'package:appointment/models/entities/Pacient.dart';
 import 'package:appointment/utils/Utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:appointment/main.dart';
 
@@ -81,6 +83,7 @@ class NewPacientState extends State<NewPacient> {
                 child: TextFormField(
                   controller: phoneNumberController,
                   inputFormatters: [phoneNumberMask],
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                       labelText: "Patient phone number",
                       hintText: "Patient phone number",
@@ -102,8 +105,9 @@ class NewPacientState extends State<NewPacient> {
                     } else {
                       Pacient newP = Pacient(name: nameController.text, email: emailController.text, phoneNumber: phoneNumberController.text, extra: extraController.text);
                       await DBController().insertPatient(newP);
-
                       newP = new Pacient();
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AllPacients()));
+
                     }
                   })
             ),

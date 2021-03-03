@@ -33,7 +33,7 @@ class Appointment {
 
   @override
   String toString(){
-    return '${hourFormatter.format(monthDay)}, $id';
+    return '${hourFormatter.format(monthDay)}';
   }
 
   @override

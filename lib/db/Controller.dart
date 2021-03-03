@@ -34,6 +34,7 @@ class DBController{
   }
 
 
+
   //full list of patients
   Future<List<Pacient>> pacients() async {
     // Get a reference to the database.
@@ -92,12 +93,15 @@ class DBController{
     });
   }
 
+  Future<Pacient> getPacientByPhone(String phoneNumber) async {
+    List<Pacient> p = await DBController().getPacientsByPN(phoneNumber);
+    return p[0];
+  }
+
   Future<void> deletePacient(int id) async {
     final db = await getDB();
-
     await db.delete(
         'patients', where: "id = ?", whereArgs: [id]
-
     );
   }
 
@@ -206,5 +210,14 @@ class DBController{
 
     await db.update('appointments', appointment.toMap(),
         where: "id = ?", whereArgs: [appointment.id]);
+  }
+
+  Future<bool> testPhoneOnDB(String phoneNumber) async {
+    List<Pacient> pList = await DBController().getPacientsByPN(phoneNumber);
+    if(pList.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

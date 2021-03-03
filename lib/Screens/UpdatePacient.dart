@@ -312,6 +312,9 @@ class UpdatePacientState extends State<UpdatePacient> {
                                     Utils().showMyDialog("Empty Fields", "Name field can't be empty", context);
                                   } else if(phoneNumberController.text == "" || phoneNumberController.text == "Phone Number") {
                                     Utils().showMyDialog("Empty Fields", "Phone field can't be empty", context);
+                                  }
+                                  if(await DBController().testPhoneOnDB(phoneNumberController.value.toString())) {
+                                    Utils().showMyDialog("Phone already used", "Phone number already registered", context);
                                   } else {
                                     Pacient p = await DBController().getPacientFromAppointment(AppointmentDetailsState.appointmentHolder);
                                     Appointment a = await DBController().getAppn(AppointmentDetailsState.appointmentHolder.id);
