@@ -55,6 +55,10 @@ class Pacient {
   @override
   int get hashCode => id.hashCode;
 
+  String toStringNewAppointmentDropdownFormat() {
+      return'$name, $phoneNumber';
+  }
+
   @override
   String toString() {
     if (email != "" || email != null) {

@@ -93,6 +93,25 @@ class DBController{
     });
   }
 
+  Future<List<Pacient>> getPacientsByPNLike(String pattern) async {
+    // Get a reference to the database.
+    final Database db = await getDB();
+
+    // Query the table for all The pacients.
+    final List<Map<String, dynamic>> maps = await db.rawQuery("SELECT * FROM patients WHERE phoneNumber LIKE '%$pattern%'");
+
+    // Convert the List<Map<String, dynamic> into a List<Pacient>.
+    return List.generate(maps.length, (i) {
+      return Pacient(
+        id: maps[i]['id'],
+        name: maps[i]['name'],
+        email: maps[i]['email'],
+        phoneNumber: maps[i]['phoneNumber'],
+        extra: maps[i]['extra'],
+      );
+    });
+  }
+
   Future<Pacient> getPacientByPhone(String phoneNumber) async {
     List<Pacient> p = await DBController().getPacientsByPN(phoneNumber);
     return p[0];
@@ -220,4 +239,6 @@ class DBController{
       return false;
     }
   }
+
+
 }

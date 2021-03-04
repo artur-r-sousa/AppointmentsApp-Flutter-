@@ -1,5 +1,6 @@
 import 'package:appointment/Screens/NewPacient.dart';
 import 'package:appointment/db/Controller.dart';
+import 'package:appointment/models/entities/Pacient.dart';
 import 'package:flutter/material.dart';
 
 class AllPacients extends StatefulWidget{
@@ -10,6 +11,12 @@ class AllPacients extends StatefulWidget{
 }
 
 class _AllPacientsState extends State<AllPacients>{
+
+  Pacient pacientHolder = new Pacient();
+
+  setPacientHolder(Pacient pacient) {
+    pacientHolder = pacient;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +32,26 @@ class _AllPacientsState extends State<AllPacients>{
                         itemCount: snapshot.data.length,
                         itemBuilder: (_, int position) {
                           return Card(
-                            child: ListTile(
-                              title: Text(
-                                  snapshot.data[position].toString()),
-                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text(
+                                      snapshot.data[position].toString()),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    TextButton(onPressed: () async {
+                                      final item = snapshot.data[position];
+                                      setPacientHolder(item);
+                                      DBController().deletePacient(pacientHolder.id);
+                                      setState(() {});
+                                    }, child: Text('Delete'))
+                                  ],
+                                )
+                              ],
+                            )
                           );
                         }
                     ) : Center(child: CircularProgressIndicator());

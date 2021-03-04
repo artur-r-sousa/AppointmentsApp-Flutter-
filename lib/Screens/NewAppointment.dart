@@ -1,8 +1,11 @@
+import 'dart:ffi';
+
 import 'package:appointment/Screens/AppointmentDetails.dart';
 import 'package:appointment/Screens/MyHomePage.dart';
 import 'package:appointment/db/Controller.dart';
 import 'package:appointment/models/entities/Appointment.dart';
 import 'package:appointment/models/entities/Pacient.dart';
+import 'package:appointment/utils/SearchBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -48,6 +51,7 @@ class NewAppointmentState extends State<NewAppointment> {
     return maskFormatter;
   }
 
+
   //reminder to send this method to the utils class
   Future<void> _showMyDialog(String title, String dialogText) async {
     return showDialog<void>(
@@ -81,149 +85,160 @@ class NewAppointmentState extends State<NewAppointment> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(title: Text("New Appointments")),
-      body: Container(
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-              child: Form(
-                child: TextFormField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                      labelText: "Patient Name",
-                      hintText: "Patient Name",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0)
-                      )
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-              child: Form(
-                child: TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                      labelText: "Patient email",
-                      hintText: "Patient email",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0)
-                      )
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-              child: Form(
-                child: TextFormField(
-                  decoration: InputDecoration(
-                      labelText: "Patient description",
-                      hintText: "Patient description",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0)
-                      )
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-              child: Form(
-                child: TextFormField(
-                  controller: hourController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [inputFormat()],
-                  decoration: InputDecoration(
-                      labelText: "Appointment Hour",
-                      hintText: "00:00",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0)
-                      )
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-              child: Form(
-                child: TextFormField(
-                  controller: phoneNumberController,
-                  inputFormatters: [phoneNumberMask],
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                      labelText: "Patient phone number",
-                      hintText: "Patient phone number",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0)
-                      )
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              alignment: Alignment.bottomLeft,
-              child: Row(
-                children: [
-                  FloatingActionButton(
-                      heroTag: null,
-                      child: Icon(
-                        Icons.add,
-                      ),
-                      onPressed: () async {
-                        if (nameController.text == "" || nameController.text == "Patient Name") {
-                          _showMyDialog("Empty Fields", "Name field can't be empty");
-                        } else if(phoneNumberController.text == "" || phoneNumberController.text == "Phone Number") {
-                          _showMyDialog("Empty Fields", "Phone field can't be empty");
-                        } else if(await DBController().testPhoneOnDB(phoneNumberController.text)) {
-                          _showMyDialog("Duplicate entries", "Phone already registered");
-                        } else {
-                          Appointment appNew = new Appointment();
-                          Pacient newPacient = new Pacient();
-                          newPacient.setName(nameController.text);
-                          newPacient.setEmail(emailController.text);
-                          newPacient.setPhoneNumber(phoneNumberController.text);
-                          newPacient.setExtra(extraController.text);
-                          setState(()  {
-                            DBController().insertPatient(newPacient);
-                          });
+      body: SingleChildScrollView(
+        child: Container(
+          child: Column(
+            children: [
+             FutureBuilder<List>(
+               future: DBController().pacients(),
+               builder: (context, snapshot) {
+                 return snapshot.hasData ? Container(
+                   child: SearchBar()
 
-                          newPacient = await DBController().getPacientByPhone(newPacient.phoneNumber);
-                          setState(() {
-                              appNew.setPacient(newPacient.id);
-                              hourController.text != "" ? appNew.setMonthDay(DateTime.parse("${formatter.format(MyHomePageState.selectedDate)} " + "${hourController.text}")) : appNew.setMonthDay(DateTime.now());
-                              DBController().insertAppointment(appNew);
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
+                 ) : Center(child: CircularProgressIndicator(),);
+               }
+             ),
+              Container(
+                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+                child: Form(
+                  child: TextFormField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                        labelText: "Patient Name",
+                        hintText: "Patient Name",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0)
+                        )
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+                child: Form(
+                  child: TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                        labelText: "Patient email",
+                        hintText: "Patient email",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0)
+                        )
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+                child: Form(
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                        labelText: "Patient description",
+                        hintText: "Patient description",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0)
+                        )
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+                child: Form(
+                  child: TextFormField(
+                    controller: hourController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [inputFormat()],
+                    decoration: InputDecoration(
+                        labelText: "Appointment Hour",
+                        hintText: "00:00",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0)
+                        )
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+                child: Form(
+                  child: TextFormField(
+                    controller: phoneNumberController,
+                    inputFormatters: [phoneNumberMask],
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        labelText: "Patient phone number",
+                        hintText: "Patient phone number",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0)
+                        )
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(20),
+                alignment: Alignment.bottomLeft,
+                child: Row(
+                  children: [
+                    FloatingActionButton(
+                        heroTag: null,
+                        child: Icon(
+                          Icons.add,
+                        ),
+                        onPressed: () async {
+                          if (nameController.text == "" || nameController.text == "Patient Name") {
+                            _showMyDialog("Empty Fields", "Name field can't be empty");
+                          } else if(phoneNumberController.text == "" || phoneNumberController.text == "Phone Number") {
+                            _showMyDialog("Empty Fields", "Phone field can't be empty");
+                          } else if(await DBController().testPhoneOnDB(phoneNumberController.text)) {
+                            _showMyDialog("Duplicate entries", "Phone already registered");
+                          } else {
+                            Appointment appNew = new Appointment();
+                            Pacient newPacient = new Pacient();
+                            newPacient.setName(nameController.text);
+                            newPacient.setEmail(emailController.text);
+                            newPacient.setPhoneNumber(phoneNumberController.text);
+                            newPacient.setExtra(extraController.text);
+                            setState(()  {
+                              DBController().insertPatient(newPacient);
                             });
 
-                        }
-                      }
-                  ),
-                  Padding(padding: EdgeInsets.only(left: 15), child: Text("New Appointment")),
-                ],
-              )
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              alignment: Alignment.bottomLeft,
-              child: Row(
-                children: [
-                  FloatingActionButton(
-                      heroTag: null,
-                      child: Icon(
-                          Icons.arrow_back
-                      ),
-                      onPressed: (){ setState(() {
+                            newPacient = await DBController().getPacientByPhone(newPacient.phoneNumber);
+                            setState(() {
+                                appNew.setPacient(newPacient.id);
+                                hourController.text != "" ? appNew.setMonthDay(DateTime.parse("${formatter.format(MyHomePageState.selectedDate)} " + "${hourController.text}")) : appNew.setMonthDay(DateTime.now());
+                                DBController().insertAppointment(appNew);
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AppointmentDetails()));
+                              });
 
-                        Navigator.pop(context);
-                      });}),
-                  Padding(padding: EdgeInsets.only(left: 15), child: Text("Go Back")),
-                ],
-              )
-            ),
-          ],
+                          }
+                        }
+                    ),
+                    Padding(padding: EdgeInsets.only(left: 15), child: Text("New Appointment")),
+                  ],
+                )
+              ),
+              Container(
+                padding: EdgeInsets.all(20),
+                alignment: Alignment.bottomLeft,
+                child: Row(
+                  children: [
+                    FloatingActionButton(
+                        heroTag: null,
+                        child: Icon(
+                            Icons.arrow_back
+                        ),
+                        onPressed: (){ setState(() {
+
+                          Navigator.pop(context);
+                        });}),
+                    Padding(padding: EdgeInsets.only(left: 15), child: Text("Go Back")),
+                  ],
+                )
+              ),
+            ],
+          ),
         ),
       ),
     );
